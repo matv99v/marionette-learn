@@ -31,6 +31,10 @@ var TodoList = Marionette.CompositeView.extend({
     add: 'itemAdded'
   },
 
+  modelEvents: {
+    change: 'render'
+  },
+
   onAddTodoItem: function() {
     this.model.set({
       assignee: this.ui.assignee.val(),
@@ -48,9 +52,6 @@ var TodoList = Marionette.CompositeView.extend({
       assignee: '',
       text: ''
     });
-
-    this.ui.assignee.val('');
-    this.ui.text.val('');
   }
 });
 
