@@ -1,6 +1,8 @@
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 
+var ToDoModel = require('./models/todo');
+
 
 var ToDo = Marionette.LayoutView.extend({
   tagName: 'li',
@@ -15,28 +17,38 @@ var TodoList = Marionette.CompositeView.extend({
   childView: ToDo,
   childViewContainer: 'ul',
 
-  ui: {  // 1
+  ui: {
     assignee: '#id_assignee',
     form: 'form',
     text: '#id_text'
   },
 
-  triggers: {  // 2
+  triggers: {
     'submit @ui.form': 'add:todo:item'
   },
 
-  collectionEvents: {  // 3
+  collectionEvents: {
     add: 'itemAdded'
   },
 
-  onAddTodoItem: function() {  // 4
-    this.collection.add({
-      assignee: this.ui.assignee.val(),  // 5
+  onAddTodoItem: function() {
+    this.model.set({
+      assignee: this.ui.assignee.val(),
       text: this.ui.text.val()
     });
+
+    if (this.model.isValid()) {
+      var items = this.model.pick('assignee', 'text');
+      this.collection.add(items);
+    }
   },
 
-  itemAdded: function() {  // 6
+  itemAdded: function() {
+    this.model.set({
+      assignee: '',
+      text: ''
+    });
+
     this.ui.assignee.val('');
     this.ui.text.val('');
   }
@@ -46,7 +58,8 @@ var todo = new TodoList({
   collection: new Backbone.Collection([
     {assignee: 'Scott', text: 'Write a book about Marionette'},
     {assignee: 'Andrew', text: 'Do some coding'}
-  ])
+  ]),
+  model: new ToDoModel()
 });
 
 todo.render();
